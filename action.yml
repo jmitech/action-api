@@ -22,9 +22,9 @@ runs:
       run: |
         set -euo pipefail
 
-        echo "🔐 Fetching data from APi $url ..."
+        echo "🔐 Fetching data from APi ${{ inputs.url }} ..."
 
-        API_RESPONSE=$(curl -s -H "Authorization: Bearer $JMITECH_API_TOKEN" "$url")
+        API_RESPONSE=$(curl -s -H "Authorization: Bearer $JMITECH_API_TOKEN" ${{ inputs.url }})
 
         CURL_EXIT_CODE=$?
 
@@ -50,10 +50,10 @@ runs:
 
         echo "✅ Success ($(echo "$API_RESPONSE" | wc -c) bytes)"
 
-        if [ "$output" = "log" ]; then
+        if [ "${{ inputs.output }}" = "log" ]; then
           echo "Printing output to log:"
-          echo "$API_RESPONSE" | jq ${jq}
+          echo "$API_RESPONSE" | jq ${{ inputs.jq }}
         else
           echo "Saving output to file ${output}."
-          echo "$API_RESPONSE" | jq ${jq} >"$output"
+          echo "$API_RESPONSE" | jq ${{ inputs.jq }} >"${{ inputs.output }}"
         fi
