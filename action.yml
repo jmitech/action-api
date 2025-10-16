@@ -54,6 +54,6 @@ runs:
           echo "Printing output to log:"
           echo "$API_RESPONSE" | jq ${{ inputs.jq }}
         else
-          echo "Saving output to file ${output}."
+          echo "Saving output to file ${{ inputs.output }}."
           echo "$API_RESPONSE" | jq ${{ inputs.jq }} >"${{ inputs.output }}"
         fi
