@@ -1,5 +1,6 @@
-name: actions/project-vars
+name: actions/jmitech-api
 description: Fetch data from API
+
 inputs:
   url:
     description: The full URL of the request
@@ -16,7 +17,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Send request to API
+    - name: 🛜 Send request to API
       shell: sh
       run: |
         set -euo pipefail
@@ -49,12 +50,10 @@ runs:
 
         echo "✅ Success ($(echo "$API_RESPONSE" | wc -c) bytes)"
 
-        # Process output, print to log or save to file
         if [ "$output" = "log" ]; then
           echo "Printing output to log:"
           echo "$API_RESPONSE" | jq ${jq}
         else
-          # At this point, we consider output is a file path 🤞
           echo "Saving output to file ${output}."
           echo "$API_RESPONSE" | jq ${jq} >"$output"
         fi
