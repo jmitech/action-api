@@ -1,0 +1,60 @@
+name: actions/project-vars
+description: Fetch data from API
+inputs:
+  url:
+    description: The full URL of the request
+    required: true
+  output:
+    description: Output format e.g. "log" (default) or "path to your file"
+    required: false
+    default: "log"
+  jq:
+    description: jq filter/query to apply on the response (default ".value")
+    required: false
+    default: ".value"
+
+runs:
+  using: composite
+  steps:
+    - name: Send request to API
+      shell: sh
+      run: |
+        set -euo pipefail
+
+        echo "🔐 Fetching data from APi $url ..."
+
+        API_RESPONSE=$(curl -s -H "Authorization: Bearer $JMITECH_API_TOKEN" "$url")
+
+        CURL_EXIT_CODE=$?
+
+        if [ $CURL_EXIT_CODE -ne 0 ]; then
+          echo "Error: curl command failed with exit code $CURL_EXIT_CODE."
+          exit 1
+        fi
+
+        if [ -z "$API_RESPONSE" ]; then
+          echo "Error: curl response is empty."
+          exit 1
+        fi
+
+        if echo "$API_RESPONSE" | grep -q "Unauthenticated"; then
+          echo "Error: API response indicates 'Unauthenticated'."
+          exit 1
+        fi
+
+        if echo "$API_RESPONSE" | grep -q "Forbidden"; then
+          echo "Error: API response indicates 'Forbidden'."
+          exit 1
+        fi
+
+        echo "✅ Success ($(echo "$API_RESPONSE" | wc -c) bytes)"
+
+        # Process output, print to log or save to file
+        if [ "$output" = "log" ]; then
+          echo "Printing output to log:"
+          echo "$API_RESPONSE" | jq ${jq}
+        else
+          # At this point, we consider output is a file path 🤞
+          echo "Saving output to file ${output}."
+          echo "$API_RESPONSE" | jq ${jq} >"$output"
+        fi
