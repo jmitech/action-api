@@ -20,7 +20,7 @@ runs:
     - name: 🛜 Send request to API
       shell: sh
       run: |
-        set -euo pipefail
+        set -euo
 
         echo "🔐 Fetching data from APi ${{ inputs.url }} ..."
 
